@@ -16,6 +16,9 @@ jobs:
           foldername=`basename "$dirname"`
           filename=`basename "$fname"`
           newname=`echo "$dirname" | sed -e "s/ /_/g"`
+          echo $dirname
+          echo $foldername
+          echo $filename
           cp "${dirname}/$filename" "./build/${foldername}.txt"
         done
     - name: Commit files
