@@ -19,7 +19,7 @@ jobs:
           echo $dirname
           echo $foldername
           echo $filename
-          cp "${dirname}/$filename" "./build/${foldername}.txt"
+          cp "${dirname}/$filename" "./build/${filename}.txt"
         done
     - name: Commit files
       run: |
