@@ -1,29 +1,30 @@
-# File: .github/workflows/repo-sync.yml
-
-on: 
-  push:
-    branches: [ development ]
+name: docs
+on:
+  push:
+    branches: [ development ]
+    #paths: 'myfolder/*/README.md'
 
 jobs:
-  repo-sync:
-    runs-on: ubuntu-latest
-    #steps:
-    #- name: repo-sync-lms
-    #  uses: wei/git-sync@v2
-    #  with:
-    #    source_repo: "git@github.com:murad357/parent-repo.git"
-    #    source_branch: "development"
-    #    destination_repo: "git@github.com:murad357/child-repo1.git"
-    #    destination_branch: "development"
-    #    ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-    steps:
-      - name: repo-sync
-        uses: murad357/git-sync@main
-        with:
-          source_repo: "git@github.com:murad357/parent-repo.git"
-          source_branch: "development"
-          destination_repo: "git@github.com:murad357/child-repo1.git"
-          destination_branch: "development"
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }} # optional
-          #source_ssh_private_key: ${{ secrets.SOURCE_SSH_PRIVATE_KEY }} # optional, will override `SSH_PRIVATE_KEY`
-          #destination_ssh_private_key: ${{ secrets.DESTINATION_SSH_PRIVATE_KEY }} # optional, will override `SSH_PRIVATE_KEY`
+  docit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+    - name: Copy the lms_build to root
+      run: |
+        find ./lms/build/ -type f -name "lms_build.txt" | while read fname; do
+          dirname=`dirname "$fname"`
+          foldername=`basename "$dirname"`
+          filename=`basename "$fname"`
+          newname=`echo "$dirname" | sed -e "s/ /_/g"`
+          cp "${dirname}/$filename" "./build/${foldername}.txt"
+        done
+    - name: Commit files
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "Add changes" -a
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
